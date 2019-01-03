@@ -1,0 +1,9 @@
+body {
+    background: #FFFFDD;
+    font-family:Verdana, "ＭＳ Ｐゴシック", sans-serif;
+    font-size: 80%;
+}
+
+.errors {
+    color: red;
+}
