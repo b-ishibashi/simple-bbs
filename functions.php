@@ -1,31 +1,54 @@
 <?php
 
-function h($str)
+/**
+ * HTMLエスケープ
+ *
+ * <?=h($str)?> の形で使う
+ *
+ * @param $str
+ * @return string
+ */
+function h(string $str): string
 {
-    return htmlspecialchars($str, ENT_QUOTES);
+    return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
 }
 
-function require_user_session()
+/**
+ * session_start() して，ユーザがログインしていることを要求
+ * ログインしていなければ /login.php に飛ばす
+ */
+function require_user_session(): void
 {
     session_start();
-    //未ログイン
+    // user_id がセッションに記録されていない場合は未ログインとみなす
     if (!isset($_SESSION['user_id'])) {
-        header("location: /login.php");
+        header('Location: /login.php');
         exit;
     }
 }
 
-function require_guest_session()
+/**
+ * session_start() して，ユーザがログインしていないを要求
+ * ログインしていれば /index.php に飛ばす
+ */
+function require_guest_session(): void
 {
     session_start();
-    //ログイン済み
+    // user_id がセッションに記録されていればログイン済みとみなす
     if (isset($_SESSION['user_id'])) {
-        header('location: /index.php');
+        header('Location: /index.php');
         exit;
     }
 }
 
-function is_valid_email($email, $check_dns = false)
+/**
+ * メールアドレスのバリデーション
+ *
+ * @param mixed $email
+ * @param bool $check_dns
+ * @return bool
+ */
+function is_valid_email($email, bool $check_dns = false): bool
 {
     switch (true) {
         case false === filter_var($email, FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE):
@@ -43,20 +66,38 @@ function is_valid_email($email, $check_dns = false)
     }
 }
 
-function create_user($email, $password)
+/**
+ * ユーザの新規登録
+ *
+ * @param string $email
+ * @param string $password
+ */
+function create_user(string $email, string $password): void
 {
     $pdo = pdo();
     $stmt = $pdo->prepare('insert into users (email, password) values (?, ?)');
     $stmt->execute([$email, password_hash($password, PASSWORD_DEFAULT)]);
 }
 
-function get_user_by_email($email)
+/**
+ * メールアドレスからユーザを取得
+ *
+ * @param string $email
+ * @return array|bool
+ */
+function get_user_by_email(string $email)
 {
     $stmt = pdo()->prepare('select * from users where email = ?');
     $stmt->execute([$email]);
     return $stmt->fetch();
 }
 
+/**
+ * IDからユーザを取得
+ *
+ * @param string|int $id
+ * @return array|bool
+ */
 function get_user_by_id($id)
 {
     $stmt = pdo()->prepare('select * from users where id = ?');
@@ -64,13 +105,24 @@ function get_user_by_id($id)
     return $stmt->fetch();
 }
 
-function create_post($user_id, $text)
+/**
+ * 投稿の新規作成
+ *
+ * @param string|int $user_id
+ * @param string $text
+ */
+function create_post($user_id, string $text): void
 {
     $stmt = pdo()->prepare('insert into posts (user_id, text) values (?, ?)');
     $stmt->execute([$user_id, $text]);
 }
 
-function get_posts()
+/**
+ * 投稿全件を新しい順に取得
+ *
+ * @return array
+ */
+function get_posts(): array
 {
 //    $stmt = pdo()->prepare('select * from posts order by id desc');
 //    $stmt->execute();
@@ -83,7 +135,14 @@ function get_posts()
     return $stmt->fetchAll();
 }
 
-function verify_user($email, $password)
+/**
+ * ユーザ認証
+ *
+ * @param string $email
+ * @param string $password
+ * @return array|bool
+ */
+function verify_user(string $email, string $password)
 {
     $user = get_user_by_email($email);
     if (!$user) {
@@ -95,25 +154,36 @@ function verify_user($email, $password)
     return $user;
 }
 
-function pdo()
+/**
+ * データベース接続してPDOを返す
+ *
+ * @return PDO
+ */
+function pdo(): PDO
 {
-    $pdo = new PDO('sqlite:' . __DIR__ . '/database.db');
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    // 2回目以降の呼び出しでも再利用する
+    static $pdo;
 
-    //テーブル作成
-    $pdo->exec('
-        create table if not exists users(
-          id integer primary key autoincrement,
-          email text not null,
-          password text not null  
-        );
-        create table if not exists posts(
-          id integer primary key autoincrement,
-          user_id integer not null,
-          text text not null
-        );
-    ');
+    // 初回のみ実行
+    if (!$pdo) {
+        $pdo = new PDO('sqlite:' . __DIR__ . '/database.db');
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+        // テーブル作成
+        $pdo->exec('
+            create table if not exists users(
+              id integer primary key autoincrement,
+              email text not null,
+              password text not null  
+            );
+            create table if not exists posts(
+              id integer primary key autoincrement,
+              user_id integer not null,
+              text text not null
+            );
+        ');
+    }
 
     return $pdo;
 }

@@ -14,9 +14,9 @@
             <input id="password" type="password" name="password"><br>
             <input type="submit" name="login" value="ログイン">
         </form>
-        <?php if(!empty($errors)): ?>
+        <?php if (!empty($errors)): ?>
             <ul class="errors">
-                <?php foreach($errors as $error): ?>
+                <?php foreach ($errors as $error): ?>
                     <li><?=h($error)?></li>
                 <?php endforeach; ?>
             </ul>
