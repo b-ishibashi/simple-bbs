@@ -12,16 +12,16 @@
         <form action="" method="post">
             <label>投稿内容:<textarea name="text"></textarea></label>
             <input type="submit" value="送信" name="send">
-            <?php if(!empty($errors)): ?>
+            <?php if (!empty($errors)): ?>
             <ul class="errors">
-                <?php foreach($errors as $error): ?>
+                <?php foreach ($errors as $error): ?>
                     <li><?=h($error)?></li>
                 <?php endforeach; ?>
             </ul>
             <?php endif; ?>
         </form>
         <h2>投稿一覧</h2>
-        <?php foreach($posts as $post): ?>
+        <?php foreach ($posts as $post): ?>
         <article>
             <div class="">
                 No.<?=h($post['id'])?>

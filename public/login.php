@@ -17,7 +17,7 @@ if (isset($_POST['login'])) {
     if (empty($errors)) {
         if ($user = verify_user($_POST['email'], $_POST['password'])) {
             $_SESSION['user_id'] = $user['id'];
-            header('Location: index.php');
+            header('Location: /index.php');
             exit;
         }
         $errors[] = 'メールアドレスかパスワードが間違っています';
