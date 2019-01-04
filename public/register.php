@@ -11,14 +11,14 @@ if (isset($_POST['register'])) {
         $errors[] = 'メールアドレスを入力してください';
     } elseif (!is_valid_email($_POST['email'], true)) {
         $errors[] = 'メールアドレスが無効です';
-    } elseif (read_account_password($_POST['email']) !== null) {
+    } elseif (get_user_by_email($_POST['email'])) {
         $errors[] = 'すでに登録されています';
     }
     if (mb_strlen($_POST['password']) < 8) {
         $errors[] = 'パスワードは8文字以上で入力してください';
     }
     if (empty($errors)) {
-        write_account($_POST['email'], $_POST['password']);
+        create_user($_POST['email'], $_POST['password']);
         header('Location: /login.php');
         exit;
     }
