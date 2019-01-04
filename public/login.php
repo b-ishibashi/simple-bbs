@@ -15,8 +15,8 @@ if (isset($_POST['login'])) {
         $errors[] = 'パスワードを入れてください';
     }
     if (empty($errors)) {
-        if (verify_account($_POST['email'], $_POST['password'])) {
-            $_SESSION['email'] = $_POST['email'];
+        if ($user = verify_user($_POST['email'], $_POST['password'])) {
+            $_SESSION['user_id'] = $user['id'];
             header('Location: index.php');
             exit;
         }

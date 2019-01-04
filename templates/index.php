@@ -7,11 +7,10 @@
     </head>
     <body>
         <h1>掲示板</h1>
-        <div>こんにちは! <?=h($_SESSION["email"])?>さん。</div>
+        <div>こんにちは! <?=h($user['email'])?>さん。</div>
         <a href="/logout.php">ログアウト</a>
         <form action="" method="post">
-            <label>名前:<input type="text" name="name"></label><br>
-            <label>投稿内容:<textarea name="comment"></textarea></label>
+            <label>投稿内容:<textarea name="text"></textarea></label>
             <input type="submit" value="送信" name="send">
             <?php if(!empty($errors)): ?>
             <ul class="errors">
@@ -22,13 +21,16 @@
             <?php endif; ?>
         </form>
         <h2>投稿一覧</h2>
-        <?php foreach($rows as $row): ?>
+        <?php foreach($posts as $post): ?>
         <article>
+            <div class="">
+                No.<?=h($post['id'])?>
+            </div>
             <div class="name">
-                名前:<?=h($row[0])?>
+                Name:<?=h($post['email'])?>
             </div>
             <div class="comment">
-                本文:<?=h($row[1])?>
+                本文:<?=h($post['text'])?>
             </div>
         </article>
         <?php endforeach; ?>
